@@ -8,5 +8,9 @@ wc: wc.l
 	flex -o wc.yy.c wc.l
 	cc -o $@ wc.yy.c
 
+includer: includer.l
+	flex -o includer.yy.c includer.l
+	cc -o $@ includer.yy.c
+
 clean:
 	rm calc calc.tab.c calc.yy.c
