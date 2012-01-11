@@ -8,7 +8,8 @@
 "*"     { return MUL; }
 "/"     { return DIV; }
 "|"     { return ABS; }
-[0-9]+  { yylval = atoi(yytext); return NUMBER; }
+[0-9]+  { yylval = atol(yytext); return NUMBER; }
+"0x"[a-f0-9]+ { yylval = strtol(yytext, 0, 16); return NUMBER; }
 "\n"    { return EOL; }
 [ \t]   { }
 "("     { return OP; }

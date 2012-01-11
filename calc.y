@@ -1,5 +1,6 @@
 %{
 #include <stdio.h>
+#include <stdlib.h>
 %}
 
 %token OP CP
@@ -10,7 +11,8 @@
 %%
 
 calclist:
-  | calclist exp EOL { printf("= %d\n", $2); }
+  | EOL               { printf("Nothing :(\n"); }
+  | calclist exp EOL  { printf("= %d ( 0x%x )\n", $2, $2); }
   ;
 
 exp: factor
