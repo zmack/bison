@@ -2,15 +2,17 @@
 calc: calc.l calc.y
 	bison -o calc.tab.c -d calc.y
 	flex -o calc.yy.c calc.l
-	cc -o $@ calc.tab.c calc.yy.c -lfl
+	cc -o bin/$@ calc.tab.c calc.yy.c -lfl
 
 wc: wc.l
 	flex -o wc.yy.c wc.l
-	cc -o $@ wc.yy.c
+	cc -o bin/$@ wc.yy.c
 
 includer: includer.l
 	flex -o includer.yy.c includer.l
-	cc -o $@ includer.yy.c
+	cc -o bin/$@ includer.yy.c
+
+all: calc wc includer
 
 clean:
-	rm calc calc.tab.c calc.yy.c
+	rm bin/* *.yy.c *.tab.c
