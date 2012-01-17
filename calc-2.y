@@ -11,8 +11,11 @@
 
 %token <d> NUMBER
 %token EOL
+%left '+' '-'
+%left '*' '/'
+%nonassoc '|' UMINUS
 
-%type <a> exp factor term
+%type <a> exp
 
 %%
 calclist:
@@ -24,19 +27,14 @@ calclist:
   | calclist EOL { printf("> "); }
   ;
 
-exp: factor
-  | exp '+' factor { $$ = new_ast('+', $1, $3); }
-  | exp '-' factor { $$ = new_ast('-', $1, $3); }
-  ;
-
-factor: term
-  | factor '*' term { $$ = new_ast('*', $1, $3); }
-  | factor '/' term { $$ = new_ast('/', $1, $3); }
-  ;
-
-term: NUMBER { $$ = new_num($1); }
-  | '|' term { $$ = new_ast('|', $2, NULL); }
+exp:
+  exp '+' exp { $$ = new_ast('+', $1, $3); }
+  | exp '-' exp { $$ = new_ast('-', $1, $3); }
+  | exp '*' exp { $$ = new_ast('*', $1, $3); }
+  | exp '/' exp { $$ = new_ast('/', $1, $3); }
+  | '|' exp     { $$ = new_ast('|', $2, NULL); }
   | '(' exp ')' { $$ = $2; }
-  | '-' term { $$ = new_ast('M', $2, NULL); }
+  | '-' exp %prec UMINUS    { $$ = new_ast('M', $2, NULL); }
+  | NUMBER      { $$ = new_num($1); }
   ;
 %%
