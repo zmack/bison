@@ -16,6 +16,11 @@ conc: conc.l
 	flex -o conc.yy.c conc.l
 	cc -o bin/$@ conc.yy.c
 
+calc-2:
+	bison -o calc-2.tab.h calc-2.y
+	flex -o calc-2.yy.c calc-2.l
+	cc -o bin/$@ calc-2.yy.c calc-2.c -lfl
+
 all: calc wc includer conc
 
 clean:
