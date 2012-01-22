@@ -21,6 +21,11 @@ calc-2:
 	flex -o calc-2.yy.c calc-2.l
 	cc -o bin/$@ calc-2.yy.c calc-2.c -lfl
 
+supercalc:
+	bison -o supercalc.tab.h supercalc.y
+	flex -o supercalc.yy.c supercalc.l
+	cc -o bin/$@ supercalc.yy.c supercalc.c -lfl
+
 all: calc wc includer conc
 
 clean:
