@@ -10,12 +10,15 @@ EXP       ([Ee][-+]?[0-9]+)
 "-" |
 "*" |
 "/" |
+"%" |
 "=" |
 "|" |
 "," |
 ";" |
 "(" |
-")"       { return yytext[0]; }
+")" |
+"{" |
+"}" { return yytext[0]; }
 
 ">"     { yylval.function = 1; return CMP; }
 "<"     { yylval.function = 2; return CMP; }
@@ -46,5 +49,5 @@ EXP       ([Ee][-+]?[0-9]+)
 
 \\\n    { printf("c> "); }
 \n      { return EOL; }
-.       { yyerror("Mystery character %c\n", *yytext); }
+.       { yyerror("Mystery character %s\n", *yytext); }
 %%

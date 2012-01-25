@@ -172,6 +172,7 @@ void treefree(struct ast *a)
     case '-':
     case '*':
     case '/':
+    case '%':
     case '1': case '2': case '3': case '4': case '5': case '6':
     case 'L':
       treefree(a->right);
@@ -253,6 +254,7 @@ double eval(struct ast *a)
   case '-': v = eval(a->left) - eval(a->right); break;
   case '*': v = eval(a->left) * eval(a->right); break;
   case '/': v = eval(a->left) / eval(a->right); break;
+  case '%': v = fmod(eval(a->left), eval(a->right)); break;
   case '|': v = fabs(eval(a->left)); break;
   case 'M': v = -eval(a->left); break;
 
@@ -322,7 +324,7 @@ static double callbuiltin(struct fncall *f)
   case B_log:
     return log(v);
   case B_print:
-    printf("= %4.4g\n", v);
+    return printf("= %4.4g\n", v);
   default:
     yyerror("Unknown built-in %d", functype);
     return 0.0;
@@ -417,7 +419,14 @@ void yyerror(char *s, ...) {
   fprintf(stderr, "\n");
 }
 
-int main() {
-  printf("> ");
-  return yyparse();
+int main(int argc, char **argv) {
+  if (argc == 1) {
+    printf("> ");
+    return yyparse();
+  } else {
+    FILE *f = fopen(argv[1], "r");
+    yyin = f;
+    yyparse();
+    fclose(yyin);
+  }
 }

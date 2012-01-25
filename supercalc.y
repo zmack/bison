@@ -21,24 +21,32 @@
 %nonassoc <function> CMP
 %right '='
 %left '+' '-'
-%left '*' '/'
+%left '*' '/' '%'
 %nonassoc '|' UMINUS
 
-%type <a> exp stmt list explist
+%type <a> exp stmt list explist flow block
 %type <sl> symlist
 
 %start calclist
 
 %%
 
-stmt: IF exp THEN list                { $$ = new_flow('I', $2, $4, NULL); }
-  | IF exp THEN list ELSE list        { $$ = new_flow('I', $2, $4, $6); }
-  | WHILE exp DO list                 { $$ = new_flow('W', $2, $4, NULL); }
+flow: IF exp block                  { $$ = new_flow('I', $2, $3, NULL); }
+  | IF exp block ELSE block         { $$ = new_flow('I', $2, $3, $5); }
+  | WHILE exp block                 { $$ = new_flow('W', $2, $3, NULL); }
+  ;
+
+stmt: flow
   | exp
   ;
 
+block: flow
+  | exp
+  | '{' list '}'  { $$ = $2; }
+  ;
+
 list:             { $$ = NULL; }
-  | stmt ';' list {
+  | block ';' list {
                     if ($3 == NULL) {
                       $$ = $1;
                     } else {
@@ -52,6 +60,7 @@ exp: exp CMP exp              { $$ = new_cmp($2, $1, $3); }
   | exp '-' exp               { $$ = new_ast('-', $1, $3); }
   | exp '*' exp               { $$ = new_ast('*', $1, $3); }
   | exp '/' exp               { $$ = new_ast('/', $1, $3); }
+  | exp '%' exp               { $$ = new_ast('%', $1, $3); }
   | '|' exp                   { $$ = new_ast('|', $2, NULL); }
   | '(' exp ')'               { $$ = $2 }
   | '-' exp %prec UMINUS      { $$ = new_ast('M', $2, NULL); }
@@ -72,12 +81,12 @@ symlist: NAME                 { $$ = new_symlist($1, NULL); }
 
 calclist:
   | calclist stmt EOL         {
-                                printf("= %4.4g\n>", eval($2));
+                                printf("= %4.4g\n> ", eval($2));
                                 treefree($2);
                               }
   | calclist LET NAME '(' symlist ')' '=' list EOL {
                                 dodef($3, $5, $8);
-                                printf("Defined %s\n>", $3->name);
+                                printf("Defined %s\n> ", $3->name);
                               }
-  | calclist error EOL        { yyerrok; printf(">"); }
+  | calclist error EOL        { yyerrok; printf("> "); }
   ;
