@@ -1,3 +1,4 @@
 bin/*
 *.tab.*
 *.yy.*
+sample*
