@@ -22,7 +22,7 @@ calc-2:
 	cc -o bin/$@ calc-2.yy.c calc-2.c -lfl
 
 supercalc:
-	bison -o supercalc.tab.h supercalc.y
+	bison -v -o supercalc.tab.h supercalc.y
 	flex -o supercalc.yy.c supercalc.l
 	cc -o bin/$@ supercalc.yy.c supercalc.c -lfl
 

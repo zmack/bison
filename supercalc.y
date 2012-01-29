@@ -16,7 +16,7 @@
 %token <s> NAME;
 %token <function> FUNC;
 %token EOL
-%token IF THEN ELSE WHILE DO LET
+%token IF ELSE WHILE LET
 
 %nonassoc <function> CMP
 %right '='
@@ -24,19 +24,27 @@
 %left '*' '/' '%'
 %nonassoc '|' UMINUS
 
-%type <a> exp stmt list explist flow block
+%type <a> exp stmt list explist flow block matched unmatched conditional
 %type <sl> symlist
 
 %start calclist
 
 %%
 
-flow: IF exp block                  { $$ = new_flow('I', $2, $3, NULL); }
-  | IF exp block ELSE block         { $$ = new_flow('I', $2, $3, $5); }
-  | WHILE exp block                 { $$ = new_flow('W', $2, $3, NULL); }
+matched: IF exp block ELSE block        { $$ = new_flow('I', $2, $3, $5); }
+
+unmatched: IF exp block                 { $$ = new_flow('I', $2, $3, NULL); }
+  | IF exp matched ELSE block           { $$ = new_flow('I', $2, $3, $5); }
+
+conditional: matched
+  | unmatched
   ;
 
-stmt: flow
+flow: WHILE exp block                     { $$ = new_flow('W', $2, $3, NULL); }
+  ;
+
+stmt: conditional
+  | flow
   | exp
   ;
 
@@ -46,6 +54,7 @@ block: flow
   ;
 
 list:             { $$ = NULL; }
+  | exp
   | block ';' list {
                     if ($3 == NULL) {
                       $$ = $1;
@@ -84,7 +93,7 @@ calclist:
                                 printf("= %4.4g\n> ", eval($2));
                                 treefree($2);
                               }
-  | calclist LET NAME '(' symlist ')' '=' list EOL {
+  | calclist LET NAME '(' symlist ')' '=' block EOL {
                                 dodef($3, $5, $8);
                                 printf("Defined %s\n> ", $3->name);
                               }

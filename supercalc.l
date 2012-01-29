@@ -28,10 +28,8 @@ EXP       ([Ee][-+]?[0-9]+)
 "<="    { yylval.function = 6; return CMP; }
 
 "if"    { return IF; }
-"then"  { return THEN; }
 "else"  { return ELSE; }
 "while" { return WHILE; }
-"do"    { return DO; }
 "let"   { return LET; }
 
 "sqrt"    { yylval.function = B_sqrt; return FUNC; }
